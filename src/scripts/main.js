@@ -1,39 +1,35 @@
-'use strict';
+// Pobierz i skonwertuj liczbę z tekstu
+const getNumber = span => {
+  let t = span.textContent.replace(/\u00A0/g, ' ')
+                          .replace(/[^\d.,+-]/g, '');
+  t = t.trim();
+  if (!t || /^[+-.]$/.test(t)) return null;
+  const n = Number(t.replace(',', '.'));
+  return isNaN(n) ? null : n;
+};
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Pobierz wszystkie elementy z klasą 'population' z DOM
-  const populationElements = document.querySelectorAll('.population');
+// Formatowanie liczb z wykryciem separatora tysięcy
+const formatNum = (n, sample) => {
+  const sep = sample.match(/[\s,.](?=\d{3})/)?.[0] || ',';
+  const nf = new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: 0,
+    useGrouping: true
+  });
+  return nf.format(n).replace(/,/g, sep);
+};
 
-  // Zamień ich tekstową zawartość na liczby
-  const populations = Array.from(populationElements)
-    .map(span => {
-      const text = span.textContent
-        .replace(/\u00A0/g, ' ')       
-        .replace(/[^\d.-]/g, '');     
-      return Number(text.trim());
-    })
-    .filter(num => !isNaN(num));      
+// Obliczanie sumy i średniej
+const spans = document.querySelectorAll('.population');
+const nums = Array.from(spans).map(getNumber).filter(n => n !== null);
 
-  // Oblicz sumę
-  const total = populations.reduce((acc, num) => acc + num, 0);
+const total = nums.reduce((a, b) => a + b, 0);
+const avg = nums.length ? total / nums.length : 0;
 
-  const average = populations.length > 0
-    ? total / populations.length
-    : 0;
+const totalSpan = document.querySelector('.total-population');
+const avgSpan = document.querySelector('.average-population');
 
-  const formatNumber = num => {
-    return num.toLocaleString(undefined, { maximumFractionDigits: 0 });
-  };
+if (totalSpan) 
+  totalSpan.textContent = formatNum(total, spans[0]?.textContent || '');
+if (avgSpan) 
+  avgSpan.textContent = formatNum(avg, spans[0]?.textContent || '');
 
-  // Zaktualizuj DOM z obliczonymi wartościami
-  const averageSpan = document.querySelector('.average-population');
-  const totalSpan = document.querySelector('.total-population');
-
-  if (averageSpan) {
-    averageSpan.textContent = formatNumber(Math.round(average));
-  }
-
-  if (totalSpan) {
-    totalSpan.textContent = formatNumber(total);
-  }
-});
