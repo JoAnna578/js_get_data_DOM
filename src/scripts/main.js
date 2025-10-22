@@ -28,8 +28,14 @@ const avg = nums.length ? total / nums.length : 0;
 const totalSpan = document.querySelector('.total-population');
 const avgSpan = document.querySelector('.average-population');
 
-if (totalSpan) 
-  totalSpan.textContent = formatNum(total, spans[0]?.textContent || '');
-if (avgSpan) 
-  avgSpan.textContent = formatNum(avg, spans[0]?.textContent || '');
+if (totalSpan) {
+  const firstText = spans.length > 0 ? spans[0].textContent : '';
+  totalSpan.textContent = formatNum(total, firstText);
+}
+
+if (avgSpan) {
+  const firstText = spans.length > 0 ? spans[0].textContent : '';
+  avgSpan.textContent = formatNum(avg, firstText);
+}
+
 
